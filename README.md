@@ -167,7 +167,3 @@ sample-app/
 - [Kernel Documentation](https://onkernel.com/docs)
 - [Stagehand V3 Documentation](https://docs.stagehand.dev)
 - [Zod Documentation](https://zod.dev)
-
-## License
-
-MIT
