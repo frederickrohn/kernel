@@ -11,8 +11,7 @@ interface SearchQueryInput {
 }
 
 interface SearchQueryOutput {
-  teamSize: string;
-  // FOR GOOGLE: Change to { url: string; }
+  hasAIOverview: boolean;
 }
 
 // LLM API Keys are set in the environment during `kernel deploy <filename> -e OPENAI_API_KEY=XXX`
@@ -25,20 +24,16 @@ if (!OPENAI_API_KEY) {
 }
 
 app.action<SearchQueryInput, SearchQueryOutput>(
-  'headcount-task',
-  // FOR GOOGLE: Change action name to 'google-search-task'
+  'google-ai-overview-check',
   async (ctx: KernelContext, payload?: SearchQueryInput): Promise<SearchQueryOutput> => {
-    // A function that returns the team size of a Y Combinator startup
-    // FOR GOOGLE: Change description to "returns the first search result URL from Google"
+    // A function that checks if a Google search has an AI Overview
 
     // Args:
     //     ctx: Kernel context containing invocation information
-    //     payload: A startup name to search for on Y Combinator
-    //              FOR GOOGLE: Change to "A search query string"
+    //     payload: A search query string
 
     // Returns:
-    //     output: The team size (number of employees) of the startup
-    //             FOR GOOGLE: Change to "The URL of the first search result"
+    //     output: Whether the search results page has an AI Overview
 
     const query = payload?.query || 'kernel';
 
@@ -67,36 +62,27 @@ app.action<SearchQueryInput, SearchQueryOutput>(
     /////////////////////////////////////
     
     // V3: Access page through context.pages()[0]
-    // V3: act() is called on stagehand, not page
-    const page = stagehand.context.pages()[0]!; // ! is used to tell TypeScript that the page is not null
-    await page.goto("https://www.ycombinator.com/companies");
-    await stagehand.act(`Type in "${query}" into the search box`);
-    await stagehand.act("Click on the first search result");
-    const teamSizeSchema = z.object({
-      teamSize: z.string(),
+    const page = stagehand.context.pages()[0]!;
+    await page.goto("https://www.google.com");
+    
+    // Atomic action: type query
+    await stagehand.act(`Type "${query}" into the search bar`);
+
+    // Atomic action: press Enter
+    await stagehand.act(`Press Enter`);
+    
+    // Wait for search results to load
+    await page.waitForLoadState('networkidle');
+    
+    // Extract AI Overview presence
+    const aiOverviewSchema = z.object({
+      hasAIOverview: z.boolean(),
     });
-    const output = await stagehand.extract( // V3: extract() takes instruction as first param, schema as second
-      "Extract the team size (number of employees) shown on this Y Combinator company page.",
-      teamSizeSchema
+    
+    const output = await stagehand.extract(
+      "Check if there is an AI Overview section visible on this Google search results page. Return true if present, false if not.",
+      aiOverviewSchema
     );
-
-
-    // FOR GOOGLE: Change to await page.goto("https://www.google.com");
-    // FOR GOOGLE: Change to `Type in ${query} into the Google search bar`
-    // FOR GOOGLE: Change to "Press Enter"
-
-    // Schema definition
-    
-    // FOR GOOGLE: Change schema to:
-    // const urlSchema = z.object({
-    //   url: z.string(),
-    // });
-    
-    // FOR GOOGLE: Change to:
-    // const output = await stagehand.extract(
-    //   "Extract the URL of the first organic search result (not an ad)",
-    //   urlSchema
-    // );
     
     await stagehand.close();
     await kernel.browsers.deleteByID(kernelBrowser.session_id);
