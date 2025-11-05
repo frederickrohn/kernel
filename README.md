@@ -83,7 +83,7 @@ npm install
 You'll need an OpenAI API key for Stagehand's AI-powered actions. Set it as an environment variable during deployment:
 
 ```bash
-kernel deploy index.ts -e OPENAI_API_KEY=sk-...
+kernel deploy sample-app/index.ts -e OPENAI_API_KEY=sk-...
 ```
 
 See [Kernel's environment variables documentation](https://onkernel.com/docs/launch/deploy#environment-variables) for more details.
@@ -93,7 +93,7 @@ See [Kernel's environment variables documentation](https://onkernel.com/docs/lau
 ### Deploy to Kernel
 
 ```bash
-kernel deploy index.ts -e OPENAI_API_KEY=your_openai_api_key
+kernel deploy sample-app/index.ts -e OPENAI_API_KEY=your_openai_api_key
 ```
 
 ### Invoke the Action
@@ -139,7 +139,7 @@ This project demonstrates several Stagehand V3 capabilities:
 You can test the action locally by running it through Kernel's local development server:
 
 ```bash
-kernel dev index.ts
+kernel dev sample-app/index.ts
 ```
 
 ### Debugging
@@ -155,11 +155,13 @@ Visit this URL to watch the browser automation in real-time.
 ## Project Structure
 
 ```
-sample-app/
-├── index.ts          # Main application code
-├── package.json      # Dependencies
-├── tsconfig.json     # TypeScript configuration
-└── README.md         # This file
+kernel-demo/
+├── sample-app/
+│   ├── index.ts          # Main application code
+│   ├── package.json      # Dependencies
+│   └── tsconfig.json     # TypeScript configuration
+├── .cursorrules          # Cursor AI rules for the project
+└── README.md             # This file
 ```
 
 ## Learn More
