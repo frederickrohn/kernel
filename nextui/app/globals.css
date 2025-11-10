@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2e5df; /* warm sandstone */
+  --foreground: #464f2d; /* desert sage */
+  --accent-clay: #c96235; /* adobe clay */
+  --accent-sand: #c9976d; /* sunlit sand */
+  --accent-sage: #7d9ea5; /* desert dawn */
+  --accent-sun: #be5e1f; /* mesa sunset */
 }
 
 @theme inline {
@@ -14,13 +18,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #464f2d;
+    --foreground: #f2e5df;
   }
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  margin: 0;
+  background: radial-gradient(circle at top left, color-mix(in srgb, var(--accent-sand) 30%, transparent), transparent 55%),
+    radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent-clay) 25%, transparent), transparent 45%),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
 }
