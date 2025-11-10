@@ -11,7 +11,7 @@ interface SearchQueryInput {
 }
 
 interface SearchQueryOutput {
-  hasAIOverview: boolean;
+  aiOverview: string | null;
 }
 
 // LLM API Keys are set in the environment during `kernel deploy <filename> -e OPENAI_API_KEY=XXX`
@@ -73,20 +73,30 @@ app.action<SearchQueryInput, SearchQueryOutput>(
     
     // Wait for search results to load
     await page.waitForLoadState('networkidle');
+
+    // create the overviewText object to return/populate
+    let overviewText: string | null = null;
     
-    // Extract AI Overview presence
-    const aiOverviewSchema = z.object({
-      hasAIOverview: z.boolean(),
-    });
-    
-    const output = await stagehand.extract(
+    const checkOverview = await stagehand.extract(
       "Check if there is an AI Overview section visible on this Google search results page. Return true if present, false if not.",
-      aiOverviewSchema
+      z.object({ hasAIOverview: z.boolean() })
     );
+
+    if(checkOverview.hasAIOverview) {
+      const [showMoreButton] = await stagehand.observe("find the show more button of the AI overview section");
+      if(showMoreButton) {
+        await stagehand.act(showMoreButton);
+        const output = await stagehand.extract("extract the text of the AI overview section",
+          z.object({ aiOverview: z.string() }
+        ));
+        overviewText = output.aiOverview.trim(); //populate the overviewText object
+      }
+
+    }
     
     await stagehand.close();
     await kernel.browsers.deleteByID(kernelBrowser.session_id);
 
-    return output;
+    return { aiOverview: overviewText };
   },
 );
