@@ -142,6 +142,16 @@ You can test the action locally by running it through Kernel's local development
 kernel dev sample-app/index.ts
 ```
 
+### Deployment
+
+Once deployed, use the following to invoke through the CLI:
+```bash
+kernel invoke google-ai-overview-check --payload '{"query":"how to create a vscode theme"}'
+# to check what applications you've deployed, use 
+kernel app list
+```
+make sure you are signed (through `kernel login`) using your credentials or this won't work
+
 ### Debugging
 
 The application logs the browser's live view URL during execution:
